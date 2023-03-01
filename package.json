@@ -1,0 +1,41 @@
+{
+  "name": "book_vm",
+  "version": "1.0.0",
+  "description": "adaptive web book reader",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js",
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hyper-hronoz/book_VM.git"
+  },
+  "keywords": [
+    "web",
+    "book",
+    "reader",
+    "nodejs",
+    "express",
+    "nosql",
+    "fucking",
+    "is",
+    "pleasure"
+  ],
+  "author": "hyper-hronoz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hyper-hronoz/book_VM/issues"
+  },
+  "homepage": "https://github.com/hyper-hronoz/book_VM#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
