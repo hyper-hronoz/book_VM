@@ -1,3 +1,5 @@
+
+
 class Model {
 
     // there will be observer pattern
@@ -5,3 +7,5 @@ class Model {
        
     }
 }
+
+module.exports = Model;

@@ -18,7 +18,6 @@ class AuthController {
     }
 
     async confirmEmail(req, res) {
-
         try {
 
         } catch (e)  {
@@ -30,7 +29,6 @@ class AuthController {
     }
 
     async login(req, res) {
-
         try {
 
         } catch (e)  {
@@ -50,7 +48,6 @@ class AuthController {
                 message: "Internal server error"
             })
         }
-
     }
 
     static async checkToken(req, res) {
@@ -63,6 +60,6 @@ class AuthController {
             })
         }
     }
-};
+}
 
-
+module.exports = new AuthController()

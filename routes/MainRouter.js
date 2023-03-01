@@ -1,8 +1,7 @@
 const router = require("express").Router();
 
-const controller = require("../controllers/AuthController")
+const controller = require("../controllers/MainController")
 
 router.get("/", controller.main)
-router.get("/books", controller.main)
 
 module.exports = router

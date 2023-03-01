@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
-const controller = require("../controllers/AuthController")
+const controller = require("../controllers/ProfileController")
 
-router.get("/favorites", controller.main)
+router.get("/", controller.stumb)
 
 module.exports = router
