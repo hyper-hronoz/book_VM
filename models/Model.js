@@ -1,20 +1,23 @@
-
-
 class Model {
-    constructor(...args) {
+    constructor(fuilds) {
+        if (fuilds) {
+            this.fuilds = fuilds
+        }
+        console.log("This is this: ", this)
+    }
 
+    checkData() {
     }
 
     save() {
-
         this._notifyChanges()
     }
 
-    static findOne(...args) {
+    static async findOne(...args) {
         console.log("Looking for one user")
     }
 
-    static deleteOne(...args) {
+    static async deleteOne(...args) {
 
     }
 

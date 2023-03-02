@@ -2,9 +2,8 @@
 const Model = require("../models/Model");
 
 class User extends Model {
-    constructor(...args) {
-        super();
-        console.log(args)
+    constructor(args) {
+        super(args);
     }
 }
 
