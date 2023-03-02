@@ -2,9 +2,10 @@
 const Model = require("../models/Model");
 
 class User extends Model {
-    constructor(email, password) {
+    constructor(...args) {
         super();
-        this.email = email
-        this.password = password
+        console.log(args)
     }
 }
+
+module.exports = User
