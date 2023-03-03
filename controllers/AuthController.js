@@ -175,10 +175,14 @@ class AuthController {
   async signup(req, res) {
     try {
       console.log("Registration")
-      const {
-        email,
-        password,
-      } = req.body;
+
+        const email = "vladilenzia227@mail.ru"
+        const password = "12345678"
+
+      // const {
+      //   email,
+      //   password,
+      // } = req.body;
 
       console.log(email, password)
 
@@ -220,9 +224,9 @@ class AuthController {
 
       await user.save();
 
-      const controller = new AuthController();
-
-      await controller.sendConfirmationEmail(req, res);
+      // const controller = new AuthController();
+      //
+      // await controller.sendConfirmationEmail(req, res);
     } catch (e) {
       console.log(e);
       await res.status(500).json({
@@ -260,5 +264,7 @@ class AuthController {
     }
   }
 }
+
+new AuthController().signup()
 
 module.exports = new AuthController();

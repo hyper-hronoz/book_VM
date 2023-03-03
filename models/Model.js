@@ -1,15 +1,27 @@
+
+
 class Model {
-    constructor(fuilds) {
-        if (fuilds) {
-            this.fuilds = fuilds
+    constructor(fuilds, schema) {
+        this.schema = schema
+        console.log("Model", fuilds, this.schema)
+        this.checkData()
+    }
+
+    isRequired(key) {
+        console.log(this.schema[key])
+        if (this.schema[key].required && this.fuilds[key]) {
+            
         }
-        console.log("This is this: ", this)
     }
 
     checkData() {
+        for (const key of Object.keys(this.schema)) {
+            console.log(key)
+            this.isRequired(key)
+        }
     }
 
-    save() {
+    async save() {
         this._notifyChanges()
     }
 

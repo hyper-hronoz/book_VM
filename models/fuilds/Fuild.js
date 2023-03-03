@@ -3,15 +3,23 @@ const defaults = {
 }
 
 class Fuild {
-    constructor(value, ...args) {
+    constructor(value) {
         this.value = value
-        this.args = args
+        this.errors = []
     }
-
-    check() {
-        console.log(value)
-        console.log(args) 
-    }  
+    
+    empty(args) {
+        try {
+            if (!this.value) {
+                if (args.message) {
+                    this.errors.push(this.message ? this.message : `Fuild is empty`)
+                }
+            }
+            return this;
+        } catch (e) {
+            console.log(e)
+        }
+    }
 }
 
 module.exports = Fuild
