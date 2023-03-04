@@ -5,6 +5,8 @@ const ejs = require("ejs");
 const path = require("path");
 const { check } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const { v4: uuidv4 } = require('uuid');
+
 
 class AuthController {
   constructor() {
@@ -216,7 +218,10 @@ class AuthController {
         }
       }
 
+      const id = uuidv4().toString()
+      console.log(typeof id)
       const user = new User({
+        id: id,
         email,
         password: passwordHashed,
         isEmailConfirmed: false,
