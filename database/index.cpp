@@ -1,7 +1,6 @@
 #include<iostream>
-#include <stack>
+#include<vector>
 #include <typeinfo>
-
 
 using namespace std;
 
@@ -17,37 +16,37 @@ template<class T>
 class SchemaFuild : public AbstractSchemaFuild {
  private:
     string _name;
-    T _type;
+    const char* _type = typeid(T).name();
     bool _isRequired;
     bool _isUnique;
 
  public:
     SchemaFuild* name(string name) {
-        this->_name = name; 
-        return this; 
-    };
-
-    SchemaFuild* required(bool value=false) {
-        this->_isRequired = value; 
+        this->_name = name;
         return this;
     }
 
-    SchemaFuild* unique(bool value=false) {
+    SchemaFuild* required(bool value = false) {
+        this->_isRequired = value;
+        return this;
+    }
+
+    SchemaFuild* unique(bool value = false) {
         this->_isUnique = value;
         return this;
     }
 
     void print() override {
         cout << "{" << "\n" <<
-                    this->_name << ","  << "\n" <<
-                    this->_isUnique << ","  << "\n" <<
-                    this->_isRequired << ","  << "\n" <<
-                    this->_type << ","  << "\n" <<
-                "}" << endl;
+           "     " << "name: " << this->_name << ","  << "\n" <<
+           "     " << "unique: " << this->_isUnique << ","  << "\n" <<
+           "     " << "required: " << this->_isRequired << ","  << "\n" <<
+           "     " << "type: " << this->_type << "\n" <<
+        "}" << ',' << endl;
     }
 
     string getName() override {
-        return "hello";
+        return this->_name;
     }
 
     bool getUnique() override {
@@ -59,47 +58,79 @@ class SchemaFuild : public AbstractSchemaFuild {
     }
 };
 
-template <class U>
 class Schema{
-public:
-    vector<U> v;
-    template <class T>
-    Schema(T n) {
-        v.push_back(n);
+ private:
+    vector<AbstractSchemaFuild*> schemaFuilds;
+
+ public:
+    explicit Schema(initializer_list<AbstractSchemaFuild*> list)
+        : schemaFuilds(list) { }
+
+    // ~Schema() {
+    //     cout << "Distroyed" << endl;
+    //     this->schemaFuilds.clear();
+    // }
+
+    void print() {
+        for (AbstractSchemaFuild* item : this->schemaFuilds) {
+            item->print();
+        }
     }
-    template <class T, class... T2>
-    Schema(T n, T2... rest) {
-        v.push_back(n);
-        Schema(rest...);
+
+    vector<AbstractSchemaFuild*> getSchemaFuilds() {
+        return this->schemaFuilds;
     }
 };
 
+struct KeyValue {
+    string key;
+    string value;
+};
+
+template<class T>
 class Model {
-    // Model(Schema) {
-    //
-    // }
+ protected:
+    Schema *schema;
+    vector<KeyValue> fuilds;
 
-    // void findOne() {
-    //     
-    // }
+ public:
+    explicit Model(Schema *schema) {
+        this->schema = schema;
+    }
+
+    explicit Model(initializer_list<KeyValue> list) : fuilds(list) {
+    }
+
+    T findOne() {
+    }
+
+ private:
+    void checkData() {
+        for (AbstractSchemaFuild* item : this->schema->getSchemaFuilds()) {
+        }
+    }
 };
 
-class User : public Model {
+class User : public Model<User> {
+ public:
+    explicit User(Schema *schema): Model<User>(schema) {}
 
+    void check() {
+        this->schema->print();
+    }
 };
 
 int main() {
-    stack<AbstractSchemaFuild> fuilds;
+    Schema *userSchema = new Schema({
+        (new SchemaFuild<string>)->name("id")->required(true)->unique(true),
+        (new SchemaFuild<string>)->name("email")->required(true)->unique(true),
+        (new SchemaFuild<string>)->name("password")->required(true),
+        (new SchemaFuild<string>)->name("email")->required(true)->unique(true),
+        (new SchemaFuild<bool>)->name("isEmailConfirmed")->required(true)
+    });
 
-    
-
-    Schema *userSchema = new Schema<AbstractSchemaFuild>(
-        (new SchemaFuild<string>())->name("id")->required(true)->unique(true),
-        (new SchemaFuild<string>())->name("email")->required(true)->unique(true),
-        (new SchemaFuild<string>())->name("password")->required(true),
-        (new SchemaFuild<string>())->name("email")->required(true)->unique(true),
-        (new SchemaFuild<bool>())->name("isEmailConfirmed")->required(true)
-    );
+    User *user = new User(userSchema);
+    user->check();
 
     return 0;
 }
