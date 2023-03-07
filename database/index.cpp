@@ -82,26 +82,40 @@ class Schema{
     }
 };
 
+template<class T>
 struct KeyValue {
-    string key;
-    string value;
+ private:
+    string _key;
+    string _value;
+    const char* _type;
+
+ public:
+    KeyValue(string key, T value) {
+        this->_key = key;
+        this->_value = value;
+    }
 };
 
 template<class T>
 class Model {
  protected:
     Schema *schema;
-    vector<KeyValue> fuilds;
+    vector<KeyValue*> *fuilds;
 
  public:
     explicit Model(Schema *schema) {
         this->schema = schema;
     }
 
-    explicit Model(initializer_list<KeyValue> list) : fuilds(list) {
+    T findOne() {
     }
 
-    T findOne() {
+    void create(initializer_list<KeyValue*> list) {
+         fuilds = new vector<KeyValue*>(list);
+    }
+
+    void printSchema() {
+        this->schema->print();
     }
 
  private:
@@ -113,11 +127,7 @@ class Model {
 
 class User : public Model<User> {
  public:
-    explicit User(Schema *schema): Model<User>(schema) {}
-
-    void check() {
-        this->schema->print();
-    }
+    explicit User(Schema *schema): Model<User>(schema) { }
 };
 
 int main() {
@@ -125,12 +135,19 @@ int main() {
         (new SchemaFuild<string>)->name("id")->required(true)->unique(true),
         (new SchemaFuild<string>)->name("email")->required(true)->unique(true),
         (new SchemaFuild<string>)->name("password")->required(true),
-        (new SchemaFuild<string>)->name("email")->required(true)->unique(true),
         (new SchemaFuild<bool>)->name("isEmailConfirmed")->required(true)
     });
 
     User *user = new User(userSchema);
-    user->check();
+
+    user->create({
+        new KeyValue<string>("id", "1"),
+        new KeyValue<string>("email", "vladilenzia227@mail.ru"),
+        new KeyValue<string>("password", "hashedpassword"),
+        new KeyValue<bool>("isEmailConfirmed", false),
+    });
+
+    user->printSchema();
 
     return 0;
 }
