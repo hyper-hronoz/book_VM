@@ -11,18 +11,12 @@ class ReaderController {
         ReaderController._instance = this;
     }
 
-    async getBooksByQuery(req, res) {
-        const book = await Book.findOne();
-    }
-
     async searchBooks(req, res) {
         console.log("Searching books")
         const {
             query,
         } = req.body;
-        console.log(query)
-        const founded = await Book.find({ $or: [{title: {$regex: query,$options: 'i' }}, {author: {$regex: query, $options: 'i' }}]})
-        return res.status(200).send(founded);
+        return res.status(200).send(await Book.find({ $or: [{title: {$regex: query,$options: 'i' }}, {author: {$regex: query, $options: 'i' }}]}));
     }
 
     async getBooks(req, res) {

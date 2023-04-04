@@ -149,7 +149,7 @@ class AuthController {
         }
     }
 
-    async login(req, res) {
+     login = async (req, res) => {
         try {
             const {
                 email,
