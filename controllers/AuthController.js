@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const User = require("../models/User")
+const User = require("../Models/User")
 const nodemailer = require("nodemailer");
 const ejs = require("ejs");
 const path = require("path");
@@ -269,7 +269,5 @@ class AuthController {
     }
   }
 }
-
-new AuthController().signup()
 
 module.exports = new AuthController();

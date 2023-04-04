@@ -1,5 +1,3 @@
-
-
 class MainController {
     constructor() {
         if (MainController._instance) {

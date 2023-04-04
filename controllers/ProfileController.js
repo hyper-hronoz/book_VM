@@ -7,9 +7,8 @@ class ProfileController {
     }
 
     stumb(req, res) {
-
+        res.send("That is main page!")
     }     
 }
-
 
 module.exports = new ProfileController();
