@@ -1,12 +1,11 @@
 const bcrypt = require("bcryptjs");
-const User = require("../Models/User")
+const User = require("../models/User");
 const nodemailer = require("nodemailer");
 const ejs = require("ejs");
 const path = require("path");
 const { check } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const { v4: uuidv4 } = require('uuid');
-
+const { v4: uuidv4 } = require("uuid");
 
 class AuthController {
   constructor() {
@@ -18,6 +17,7 @@ class AuthController {
 
   async sendConfirmationEmail(req, res) {
     try {
+      console.log("Email confirmation started");
       const {
         email,
       } = req.body;
@@ -51,17 +51,16 @@ class AuthController {
         {
           email,
         },
-        process.env.book_VM_secret,
+        process.env["book_VM_secret"],
         {
-          expiresIn: "2M",
+          expiresIn: "10h",
         },
       );
 
-      // create reusable transporter object using the default SMTP transport
       const transporter = nodemailer.createTransport({
         service: "gmail",
         port: 587,
-        secure: false, // true for 465, false for other ports
+        secure: false, 
         auth: {
           user: "nodemailertest228@gmail.com",
           pass: process.env["book_VM_password"],
@@ -81,15 +80,12 @@ class AuthController {
         },
       );
 
-      console.log(email);
-
-      // send mail with defined transport object
       const info = await transporter.sendMail({
-        from: '"Fred Foo 👻"', // sender address
-        to: email, // list of receivers
-        subject: "Email confirmation ✔", // Subject line
-        text: "Please confirm email to get access to application", // plain text body
-        html: letterTemplate, // html body
+        from: '"Fred Foo 👻"', 
+        to: email, 
+        subject: "Email confirmation ✔", 
+        text: "Please confirm email to get access to application", 
+        html: letterTemplate, 
       });
 
       console.log("Message sent: %s", info.messageId);
@@ -97,6 +93,7 @@ class AuthController {
       await res.status(200).json({
         message: "User successfull created and email sent",
       });
+
     } catch (e) {
       console.log(e);
       await res.status(500).json({
@@ -107,6 +104,44 @@ class AuthController {
 
   async finishEmailConfirmation(req, res) {
     try {
+      const token = req.params.token;
+
+      const email = jwt.verify(token, process.env["book_VM_secret"]).email;
+
+      if (!email) {
+        return res.status(400).json({
+          message: "incorret confirmation",
+        });
+      }
+
+      const user = await User.findOne({
+        email,
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found",
+        });
+      }
+
+      if (!user.isEmailConfirmed) {
+        console.log("Обновляем статус аккаунта");
+        await User.updateOne({
+          email,
+        }, {
+          isEmailConfirmed: true,
+        });
+      }
+
+      return res.send(
+        await ejs.renderFile(
+          path.join(
+            __dirname,
+            "..",
+            "/public/email_confirmed_congratulations.ejs",
+          ),
+        ),
+      );
     } catch (e) {
       console.log(e);
       await res.status(500).json({
@@ -156,7 +191,6 @@ class AuthController {
       return res.status(200).json({
         token,
       });
-
     } catch (e) {
       console.log(e);
       await res.status(500).json({
@@ -167,26 +201,23 @@ class AuthController {
 
   generateAccessToken(id) {
     const payload = {
-        id,
-    }
+      id,
+    };
     return jwt.sign(payload, process.env.book_VM_secret, {
-        expiresIn: "2160h"
-    })
+      expiresIn: "2160h",
+    });
   }
 
-  async signup(req, res) {
+  signup = async (req, res) => {
     try {
-      console.log("Registration")
+      console.log("Registration");
 
-        const email = "vladilenzia227@mail.ru"
-        const password = "12345678"
+      const {
+        email,
+        password,
+      } = req.body;
 
-      // const {
-      //   email,
-      //   password,
-      // } = req.body;
-
-      console.log(email, password)
+      console.log(email, password);
 
       const passwordHashed = bcrypt.hashSync(password, 7);
 
@@ -218,8 +249,8 @@ class AuthController {
         }
       }
 
-      const id = uuidv4().toString()
-      console.log(typeof id)
+      const id = uuidv4().toString();
+      console.log(typeof id);
       const user = new User({
         id: id,
         email,
@@ -228,26 +259,23 @@ class AuthController {
       });
 
       await user.save();
-
-      // const controller = new AuthController();
-      //
-      // await controller.sendConfirmationEmail(req, res);
+      this.sendConfirmationEmail(req, res);
     } catch (e) {
       console.log(e);
       await res.status(500).json({
         message: "Internal server error",
       });
     }
-  }
+  };
 
-  static async checkSignUpFuildsMiddleware(req, res) {
+  static async checkSignUpFieldsMiddleware(req, res) {
     check("email").isEmail().withMessage({
       message: "Not an email",
       errorCode: 1,
     }),
-    check("password").isLength({ min: 8 }).withMessage({
-      message: "Password is short",
-    });
+      check("password").isLength({ min: 8 }).withMessage({
+        message: "Password is short",
+      });
   }
 
   static async checkTokenMiddleware(req, res) {
