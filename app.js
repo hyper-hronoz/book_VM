@@ -16,11 +16,13 @@ const AuthRouter = require("./routes/AuthRouter");
 const MainRouter = require("./routes/MainRouter");
 const ProfileRouter = require("./routes/ProfileRouter");
 const ReaderController = require("./routes/ReaderRouter");
+const AdminRouter = require("./routes/AdminRouter");
 
 app.use("/", MainRouter);
 app.use("/auth", AuthRouter);
 app.use("/profile", ProfileRouter);
-app.use("/reader", ReaderController);
+app.use("/books", ReaderController);
+app.use("/admin", AdminRouter);
 
 app.listen(8080, async (error) => {
   await mongoose.connect("mongodb://127.0.0.1:27017/books").catch(e => console.e(e));
