@@ -21,10 +21,8 @@ class ReaderController {
             query,
         } = req.body;
         console.log(query)
-        await Book.createIndex({"subtitle":"text","description":"text"})
-        const founded = await Book.find({ $text: { $search: "The" } })
-        console.log(founded)
-        return res.status(200).send();
+        const founded = await Book.find({ $or: [{title: {$regex: query,$options: 'i' }}, {author: {$regex: query, $options: 'i' }}]})
+        return res.status(200).send(founded);
     }
 
     async getBooks(req, res) {
