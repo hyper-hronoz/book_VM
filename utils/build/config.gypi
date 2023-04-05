@@ -397,16 +397,6 @@
     "v8_use_siphash": 1,
     "want_separate_host_toolset": 0,
     "nodedir": "/home/hronoz/.cache/node-gyp/19.8.1",
-    "standalone_static_library": 1,
-    "userconfig": "/home/hronoz/.npmrc",
-    "cache": "/home/hronoz/.npm",
-    "local_prefix": "/home/hronoz/book_VM",
-    "globalconfig": "/usr/etc/npmrc",
-    "init_module": "/home/hronoz/.npm-init.js",
-    "prefix": "/usr",
-    "user_agent": "npm/8.19.2 node/v19.8.1 linux x64 workspaces/false",
-    "metrics_registry": "https://registry.npmjs.org/",
-    "node_gyp": "/usr/lib/node_modules/node-gyp/bin/node-gyp.js",
-    "global_prefix": "/usr"
+    "standalone_static_library": 1
   }
 }

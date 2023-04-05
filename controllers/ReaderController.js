@@ -1,7 +1,7 @@
 const path = require("path");
 const jwt = require("jsonwebtoken");
 const Book = require("../models/Book");
-const User = require("../models/User")
+const User = require("../models/User");
 const mongoose = require("mongoose");
 const fs = require("fs");
 const { log } = require("console");
@@ -30,25 +30,26 @@ class ReaderController {
             return res.status(400).send("Not book founded");
         }
 
-        await User.updateOne({
-            _id: userID
-        }, { $addToSet: { favorites: bookID } });
+        await User.updateOne(
+            {
+                _id: userID,
+            },
+            { $addToSet: { favorites: bookID } }
+        );
         return res.status(200).send("Book has been added to favorites");
     }
 
     async searchBooks(req, res) {
         console.log("Searching books");
         const { query } = req.body;
-        return res
-            .status(200)
-            .send(
-                await Book.find({
-                    $or: [
-                        { title: { $regex: query, $options: "i" } },
-                        { author: { $regex: query, $options: "i" } },
-                    ],
-                })
-            );
+        return res.status(200).send(
+            await Book.find({
+                $or: [
+                    { title: { $regex: query, $options: "i" } },
+                    { author: { $regex: query, $options: "i" } },
+                ],
+            })
+        );
     }
 
     async getBooks(req, res) {
@@ -68,16 +69,25 @@ class ReaderController {
         let symbolsAmount = req.params.symbolsStop - req.params.symbolsStart;
         let bookID = req.params.bookID;
 
-        const fileNames = fs.readdirSync("/home/hronoz/book_VM/books");
+        const books = fs.readdirSync("../books");
 
-        fileNames.forEach((item) => {
-            if (item === bookID + ".txt") {
-                res.status(200).send();
-            }
+        const targetBook = await books.findOne({ bookID });
+
+        if (!targetBook) {
+            return res.status(404).send("This book does not exists or was deleted");
+        }
+
+        const file = fs.readFile(targetBook.title, "utf8", (error) => {
+            console.error(error);
         });
 
-        res.status(404).send("This book does not exists or was deleted");
+        if (!file) {
+            return res.status(409).send("File was not found internal server error");
+        }
     }
 }
+
+const calculate = require('../utils/build/Release/HronozStream');
+console.log(calculate.read());
 
 module.exports = new ReaderController();

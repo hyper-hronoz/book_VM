@@ -1,0 +1,1 @@
+cmd_Release/HronozStream.node := ln -f "Release/obj.target/HronozStream.node" "Release/HronozStream.node" 2>/dev/null || (rm -rf "Release/HronozStream.node" && cp -af "Release/obj.target/HronozStream.node" "Release/HronozStream.node")
