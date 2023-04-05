@@ -6,6 +6,6 @@ const {checkTokenMiddleware} = require("../controllers/AuthController")
 router.get("/all", controller.getAllBooks)
 router.get("/search", controller.searchBooks)
 router.get("/:bookID/:symbolsStart/:symbolsStop", controller.getPage)
-router.put("/:bookID", checkTokenMiddleware, controller.getPage)
+router.put("/:bookID", checkTokenMiddleware, controller.addToFavorites)
 
 module.exports = router

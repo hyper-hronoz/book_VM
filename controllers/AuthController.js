@@ -279,17 +279,18 @@ class AuthController {
         }
     };
 
-    async checkTokenMiddleware(req, res) {
+    async checkTokenMiddleware(req, res, next) {
         try {
             console.log("проходим авторизацию");
             const token = req.headers.authorization.split(" ")[1];
-            console.log(token);
+            console.log("Token: ", token);
             if (!token) {
                 return res.status(401).json({ message: "Unautorized" });
             }
             const decodedData = jwt.verify(token, process.env.book_VM_secret);
             req.user = decodedData;
             console.log("пользователь авторизовался");
+            next();
         } catch (e) {
             console.log(e);
             await res.status(500).json({

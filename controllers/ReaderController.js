@@ -17,22 +17,23 @@ class ReaderController {
     }
 
     async addToFavorites(req, res) {
-        const { bookid } = req.body;
+        const bookID = req.params.bookID;
 
         const token = req.headers.authorization.split(" ")[1];
-        const userId = jwt.verify(token, process.env["book_VM_secret"]).id;
+        const userID = jwt.verify(token, process.env["book_VM_secret"]).id;
 
         const book = await Book.findOne({
-            _id: ObjectId(bookid),
+            _id: bookID,
         });
 
-        if (book) {
-            await User.updateOne({
-                _id: ObjectId(userId)
-            }, { $push: { favorites: bookid } });
+        if (!book) {
+            return res.status(400).send("Not book founded");
         }
 
-        return req.status(200).send("Book has been added to favorites");
+        await User.updateOne({
+            _id: userID
+        }, { $addToSet: { favorites: bookID } });
+        return res.status(200).send("Book has been added to favorites");
     }
 
     async searchBooks(req, res) {
