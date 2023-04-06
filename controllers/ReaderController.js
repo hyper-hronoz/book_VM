@@ -1,12 +1,10 @@
-const path = require("path");
+const { Iconv } = require("iconv");
+const HronozStream = require("../utils/build/Release/HronozStream");
 const jwt = require("jsonwebtoken");
 const Book = require("../models/Book");
 const User = require("../models/User");
 const mongoose = require("mongoose");
 const fs = require("fs");
-const { log } = require("console");
-
-const ObjectId = mongoose.Types.ObjectId;
 
 class ReaderController {
     constructor() {
@@ -84,10 +82,17 @@ class ReaderController {
         if (!file) {
             return res.status(409).send("File was not found internal server error");
         }
+
+        const text = HronozStream.read(
+            symbolsStart,
+            symbolsStop,
+            targetBook.bookPath
+        );
+
+        res.status(200).send(text);
     }
 }
 
-const calculate = require('../utils/build/Release/HronozStream');
-console.log(calculate.read());
 
 module.exports = new ReaderController();
+
