@@ -4,8 +4,7 @@
   "description": "adaptive web book reader",
   "main": "app.js",
   "scripts": {
-    "test": "node app.js",
-    "start": "node app.js"
+    "start": "cd ./utils; node-gyp configure build; cd ..; node app.js"
   },
   "repository": {
     "type": "git",
