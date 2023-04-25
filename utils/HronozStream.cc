@@ -17,6 +17,22 @@ using v8::Value;
 
 std::string testString = "fucking addon"; // value is set elsewhere.
 
+vector<string> split(string str, string token){
+    vector<string>result;
+    while(str.size()){
+        int index = str.find(token);
+        if(index!=string::npos){
+            result.push_back(str.substr(0,index));
+            str = str.substr(index+token.size());
+            if(str.size()==0)result.push_back(str);
+        }else{
+            result.push_back(str);
+            str = "";
+        }
+    }
+    return result;
+}
+
 void Read(const FunctionCallbackInfo<Value> &args) {
   Isolate *isolate = args.GetIsolate();
 
@@ -29,17 +45,17 @@ void Read(const FunctionCallbackInfo<Value> &args) {
     return;
   }
 
-  if (!args[0]->IsNumber() || !args[1]->IsNumber() || !args[2]->IsString()) {
+  if (!args[0]->IsString() || !args[1]->IsNumber() || !args[2]->IsNumber) {
     isolate->ThrowException(Exception::TypeError(
         String::NewFromUtf8(isolate, "Wrong arguments").ToLocalChecked()));
     return;
   }
 
-  double takeFrom = args[0].As<Number>()->Value();
-  double takeTo = args[1].As<Number>()->Value();
-  String::Utf8Value fileName(isolate, args[2]);
+  String::Utf8Value fileName(isolate, args[0]);
+  int page = args[1].As<Number>()->Value();
+  int maxSymbols = args[2].As<Number>()->Value();
 
-  std::cout << *fileName << std::endl;
+  std::cout << "File name: " << *fileName << std::endl;
 
   std::ifstream file(*fileName, std::ios::in);
 
@@ -48,14 +64,28 @@ void Read(const FunctionCallbackInfo<Value> &args) {
         String::NewFromUtf8(isolate, "File was not found").ToLocalChecked()));
   }
 
-  file.seekg(takeFrom);
+  std::string text((std::istreambuf_iterator<char>(file)),
+                   std::istreambuf_iterator<char>());
+
+  std::vector<std::string> words = split(text, " ");
 
   std::string response{};
-  int i = 0;
-  char ch;
-  while (file.get(ch) && i < takeTo) {
-    response += ch;
-    i++;
+
+  int tempPageCounter = 0;
+  for (std::string word : words) {
+    if (response.length() + word.length() <= maxSymbols) {
+      if (page == 0) {
+        break;
+      }
+      response += word;
+    }
+    if (response.length() + word.length() > maxSymbols) {
+      tempPageCounter++; 
+      response = "";
+    }
+    if (response.length() + word.length() <= maxSymbols && tempPageCounter == page) {
+      response += word; 
+    }
   }
 
   args.GetReturnValue().Set(
@@ -67,4 +97,4 @@ void Initialize(Local<Object> exports) {
 }
 
 NODE_MODULE(NODE_GYP_MODULE_NAME, Initialize)
-} // namespace demo
+} 
