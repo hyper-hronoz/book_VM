@@ -3,8 +3,9 @@ const HronozStream = require("../utils/build/Release/HronozStream");
 const jwt = require("jsonwebtoken");
 const Book = require("../models/Book");
 const User = require("../models/User");
-const mongoose = require("mongoose");
+const {Mongoose, ObjectId} = require("mongoose");
 const fs = require("fs");
+const path = require("path");
 
 class ReaderController {
     constructor() {
@@ -39,12 +40,16 @@ class ReaderController {
 
     async searchBooks(req, res) {
         console.log("Searching books");
-        const { query } = req.body;
+        const expression = req.params["expression"];
+        if (!expression) {
+            return res.status(400).send("Wrong request");
+        }
+        console.log(expression)
         return res.status(200).send(
             await Book.find({
                 $or: [
-                    { title: { $regex: query, $options: "i" } },
-                    { author: { $regex: query, $options: "i" } },
+                    { title: { $regex: expression, $options: "i" } },
+                    { author: { $regex: expression, $options: "i" } },
                 ],
             })
         );
@@ -62,34 +67,26 @@ class ReaderController {
 
     async getPage(req, res) {
         // save borrowed symbols
-        let symbolsStart = req.params.symbolsStart;
-        let symbolsStop = req.params.symbolsStop;
-        let symbolsAmount = req.params.symbolsStop - req.params.symbolsStart;
         let bookID = req.params.bookID;
+        let page = req.params.page;
+        let maxSymbols = req.params.symbols;
 
-        const books = fs.readdirSync("../books");
+        console.log(bookID, page, maxSymbols)
 
-        const targetBook = await books.findOne({ bookID });
+        const targetBook = await Book.findById(bookID);
 
         if (!targetBook) {
             return res.status(404).send("This book does not exists or was deleted");
         }
-
-        const file = fs.readFile(targetBook.title, "utf8", (error) => {
-            console.error(error);
-        });
-
-        if (!file) {
-            return res.status(409).send("File was not found internal server error");
-        }
+        console.log(targetBook.bookPath)
 
         const text = HronozStream.read(
-            symbolsStart,
-            symbolsStop,
-            targetBook.bookPath
+            targetBook.bookPath,
+            Number(page),
+            Number(maxSymbols),
         );
 
-        res.status(200).send(text);
+        return res.status(200).send(text);
     }
 }
 

@@ -163,7 +163,7 @@ class AuthController {
             if (!user) {
                 console.log("Пользователя не существует");
                 return res.status(404).json({
-                    message: `Пользователь c ${email} не найден`,
+                    message: `Пользователя c ${email} не найден. Хватит стучать ВЛЯВКИН`,
                 });
             }
 
@@ -214,6 +214,7 @@ class AuthController {
 
             const result = validationResult(req);
             if (!result.isEmpty()) {
+                console.log("Достаучались")
                 return res.status(400).json({ errors: result.array() });
             }
 
@@ -266,7 +267,7 @@ class AuthController {
                 id: id,
                 email,
                 password: passwordHashed,
-                isEmailConfirmed: false,
+                isEmailConfirmed: true,
             });
 
             await user.save();
