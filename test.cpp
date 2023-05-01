@@ -1,5 +1,6 @@
 #include <fstream>
 #include <iostream>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -27,22 +28,35 @@ int main() {
       "./books/Guide-to-the-Tientsi-Tientsin-Anglo--[ebooksread.com].txt");
 
   int maximalSymbols = 300;
+  int page = 3;
 
   std::string text((std::istreambuf_iterator<char>(file)),
                    std::istreambuf_iterator<char>());
 
   std::vector<std::string> words = split(text, " ");
 
-  std::string response{};
+
+  std::string temp = "";
+  std::string result = "";
+  int currentPage = 0;
 
   for (std::string word : words) {
-    if (response.length() + word.length() <= maximalSymbols) {
-      response += word;
+    if (temp.length() + word.length() + 1 > maximalSymbols && page == currentPage) {
+      result = temp;
+      break;
     }
+    if (temp.length() + word.length() + 1 > maximalSymbols) {
+      temp = "";
+      currentPage++;
+    }
+    temp += word + " ";
   }
 
-  cout << response << endl;
+  cout << result << endl;
+  // cout << "Please input page: ";
+  // cin >> page;
 
+  // std::string result = "";
 
   return 0;
 }
