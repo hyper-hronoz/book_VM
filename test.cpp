@@ -28,7 +28,7 @@ int main() {
       "./books/Guide-to-the-Tientsi-Tientsin-Anglo--[ebooksread.com].txt");
 
   int maximalSymbols = 300;
-  int page = 3;
+  int page = 0;
 
   std::string text((std::istreambuf_iterator<char>(file)),
                    std::istreambuf_iterator<char>());
@@ -39,11 +39,16 @@ int main() {
   std::string temp = "";
   std::string result = "";
   int currentPage = 0;
+  int pageCount = 0;
 
-  for (std::string word : words) {
-    if (temp.length() + word.length() + 1 > maximalSymbols && page == currentPage) {
+  for (int i = 0; i < words.size(); i++) {
+    std::string word = words[i];
+    if (page == currentPage && i == words.size() - 1) {
       result = temp;
       break;
+    }
+    if (temp.length() + word.length() + 1 > maximalSymbols && page == currentPage) {
+      result = temp;
     }
     if (temp.length() + word.length() + 1 > maximalSymbols) {
       temp = "";
@@ -53,6 +58,7 @@ int main() {
   }
 
   cout << result << endl;
+  cout << currentPage << endl;
   // cout << "Please input page: ";
   // cin >> page;
 
