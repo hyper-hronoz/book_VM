@@ -56,14 +56,14 @@ class AuthController {
                     expiresIn: "10h",
                 },
             );
-
+            
             const transporter = nodemailer.createTransport({
-                service: "gmail",
-                port: 587,
-                secure: false,
+                service: "Yandex",
+                port: 465,
+                secure: true,
                 auth: {
-                    user: "nodemailertest228@gmail.com",
-                    pass: process.env["book_VM_password"],
+                    user: "Hronologos227@yandex.ru",
+                    pass: process.env["book_VM_EMAIL_PASSWORD"],
                 },
                 tls: {
                     rejectUnauthorized: false,
@@ -81,10 +81,10 @@ class AuthController {
             );
 
             const info = await transporter.sendMail({
-                from: '"Fred Foo 👻"',
+                from: 'Hronologos227@yandex.ru',
                 to: email,
-                subject: "Email confirmation ✔",
-                text: "Please confirm email to get access to application",
+                subject: "Confirm your email",
+                text: "Email",
                 html: letterTemplate,
             });
 
@@ -267,7 +267,7 @@ class AuthController {
                 id: id,
                 email,
                 password: passwordHashed,
-                isEmailConfirmed: true,
+                isEmailConfirmed: false,
             });
 
             await user.save();

@@ -3,9 +3,10 @@ const HronozStream = require("../utils/build/Release/HronozStream");
 const jwt = require("jsonwebtoken");
 const Book = require("../models/Book");
 const User = require("../models/User");
-const {Mongoose, ObjectId} = require("mongoose");
+const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
+const { Console } = require("console");
 
 class ReaderController {
     constructor() {
@@ -15,27 +16,100 @@ class ReaderController {
         ReaderController._instance = this;
     }
 
-    async addToFavorites(req, res) {
-        const bookID = req.params.bookID;
+    getToken = (req) => {
+        return req.headers.authorization.split(" ")[1];
+    };
 
-        const token = req.headers.authorization.split(" ")[1];
-        const userID = jwt.verify(token, process.env["book_VM_secret"]).id;
+    getUserId = (req) => {
+        return jwt.verify(this.getToken(req), process.env["book_VM_secret"]).id;
+    };
 
-        const book = await Book.findOne({
-            _id: bookID,
-        });
+    async getFavBooks(req, res) {
+        try {
+            const token = req.headers.authorization.split(" ")[1];
+            const currentUserId = jwt.verify(token, process.env["book_VM_secret"]).id;
+            console.log(currentUserId);
 
-        if (!book) {
-            return res.status(400).send("Not book founded");
+            const user = await User.findById(currentUserId);
+
+            if (!user) {
+                res.status(400).send("Нет такого пользователя");
+            }
+
+            const books = await Book.find({ _id: { $in: user.favorites } });
+
+            if (!books || books.length == 0) {
+                return res.status(200).send("NO fav books found");
+            }
+
+            return res.status(200).send(books);
+        } catch (e) {
+            console.error(e);
         }
+    }
 
-        await User.updateOne(
-            {
-                _id: userID,
-            },
-            { $addToSet: { favorites: bookID } }
-        );
-        return res.status(200).send("Book has been added to favorites");
+    removeFromFavorites = async (req, res) => {
+        try {
+            const bookID = req.params.bookID;
+
+            const userID = this.getUserId(req);
+
+            console.log(bookID, userID);
+
+            // const user = await User.findById(userID);
+            const user = await User.findOne({_id: new mongoose.mongo.ObjectId(userID)});
+
+            console.log(user)
+
+            if (!user) {
+                return res.status(400).send("Юзера нет");
+            }
+
+            const result = await User.updateOne(
+                { _id: new mongoose.mongo.ObjectId(userID) },
+                { $pull: { favorites: bookID } }
+            );
+
+            if (result.modifiedCount == 0) {
+                return res.status(409).send("Bad requiest");
+            }
+
+            return res.status(200).send("Удалено успешно");
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
+    async addToFavorites(req, res) {
+        try {
+            const bookID = req.params.bookID;
+
+            const token = req.headers.authorization.split(" ")[1];
+            const userID = jwt.verify(token, process.env["book_VM_secret"]).id;
+
+            const book = await Book.findOne({
+                _id: bookID,
+            });
+
+            if (!book) {
+                return res.status(400).send("Not book founded");
+            }
+
+            const result = await User.updateOne(
+                {
+                    _id: userID,
+                },
+                { $addToSet: { favorites: bookID } }
+            );
+
+            if (result.modifiedCount == 0) {
+                return res.status(400).send("bad request");
+            }
+
+            return res.status(200).send("Book has been added to favorites");
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     async searchBooks(req, res) {
@@ -44,7 +118,7 @@ class ReaderController {
         if (!expression) {
             return res.status(400).send("Wrong request");
         }
-        console.log(expression)
+        console.log(expression);
         return res.status(200).send(
             await Book.find({
                 $or: [
@@ -71,25 +145,23 @@ class ReaderController {
         let page = req.params.page;
         let maxSymbols = req.params.symbols;
 
-        console.log(bookID, page, maxSymbols)
+        console.log(bookID, page, maxSymbols);
 
         const targetBook = await Book.findById(bookID);
 
         if (!targetBook) {
             return res.status(404).send("This book does not exists or was deleted");
         }
-        console.log(targetBook.bookPath)
+        console.log(targetBook.bookPath);
 
         const text = HronozStream.read(
             targetBook.bookPath,
             Number(page),
-            Number(maxSymbols),
+            Number(maxSymbols)
         );
 
         return res.status(200).send(text);
     }
 }
 
-
 module.exports = new ReaderController();
-

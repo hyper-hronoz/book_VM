@@ -333,6 +333,7 @@
       "lib/string_decoder.js",
       "lib/sys.js",
       "lib/test.js",
+      "lib/test/reporters.js",
       "lib/timers.js",
       "lib/timers/promises.js",
       "lib/tls.js",
@@ -396,7 +397,17 @@
     "v8_trace_maps": 0,
     "v8_use_siphash": 1,
     "want_separate_host_toolset": 0,
-    "nodedir": "/home/hronoz/.cache/node-gyp/19.8.1",
-    "standalone_static_library": 1
+    "nodedir": "/home/hronoz/.cache/node-gyp/19.9.0",
+    "standalone_static_library": 1,
+    "userconfig": "/home/hronoz/.npmrc",
+    "cache": "/home/hronoz/.npm",
+    "local_prefix": "/home/hronoz/book_VM",
+    "globalconfig": "/usr/etc/npmrc",
+    "init_module": "/home/hronoz/.npm-init.js",
+    "prefix": "/usr",
+    "user_agent": "npm/8.19.2 node/v19.9.0 linux x64 workspaces/false",
+    "metrics_registry": "https://registry.npmjs.org/",
+    "node_gyp": "/usr/lib/node_modules/node-gyp/bin/node-gyp.js",
+    "global_prefix": "/usr"
   }
 }
