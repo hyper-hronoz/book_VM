@@ -4,13 +4,11 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
-vector<string> split(string str, string token) {
-  vector<string> result;
+std::vector<std::string> split(std::string str, std::string token) {
+  std::vector<std::string> result;
   while (str.size()) {
     int index = str.find(token);
-    if (index != string::npos) {
+    if (index != std::string::npos) {
       result.push_back(str.substr(0, index));
       str = str.substr(index + token.size());
       if (str.size() == 0)
@@ -29,17 +27,13 @@ int main() {
 
   int maximalSymbols = 300;
   int page = 0;
-
-  std::string text((std::istreambuf_iterator<char>(file)),
-                   std::istreambuf_iterator<char>());
+  std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 
   std::vector<std::string> words = split(text, " ");
-
 
   std::string temp = "";
   std::string result = "";
   int currentPage = 0;
-  int pageCount = 0;
 
   for (int i = 0; i < words.size(); i++) {
     std::string word = words[i];
@@ -57,12 +51,10 @@ int main() {
     temp += word + " ";
   }
 
-  cout << result << endl;
-  cout << currentPage << endl;
-  // cout << "Please input page: ";
-  // cin >> page;
 
-  // std::string result = "";
+  result = std::to_string(currentPage) + " " + result;
+
+  std::cout << result << std::endl;
 
   return 0;
 }

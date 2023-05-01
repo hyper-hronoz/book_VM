@@ -155,9 +155,9 @@ class ReaderController {
         console.log(targetBook.bookPath);
 
         const text = HronozStream.read(
-            targetBook.bookPath,
+            Number(maxSymbols),
             Number(page),
-            Number(maxSymbols)
+            targetBook.bookPath,
         );
 
         return res.status(200).send(text);
