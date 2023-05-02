@@ -27,7 +27,7 @@ app.use("/books", require("./routes/ReaderRouter"));
 app.use("/admin", require("./routes/AdminRouter"));
 app.use("/check", require("./routes/CheckRouter"))
 
-app.listen(8080, "192.168.71.82", async (error) => {
+app.listen(8080,  async (error) => {
   await mongoose.connect("mongodb://127.0.0.1:27017/books").catch(e => console.error(e));
   if (error) {
     console.error(error);

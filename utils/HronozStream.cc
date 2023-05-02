@@ -76,6 +76,7 @@ void Read(const FunctionCallbackInfo<Value> &args) {
   for (int i = 0; i < words.size(); i++) {
     std::string word = words[i];
     if (page == currentPage && i == words.size() - 1) {
+      temp += word + " ";
       result = temp;
       break;
     }

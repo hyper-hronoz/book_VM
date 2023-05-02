@@ -23,11 +23,12 @@ std::vector<std::string> split(std::string str, std::string token) {
 
 int main() {
   std::ifstream file(
-      "./books/Guide-to-the-Tientsi-Tientsin-Anglo--[ebooksread.com].txt");
+      "./books/alatir.txt");
 
-  int maximalSymbols = 300;
-  int page = 0;
-  std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+  int maximalSymbols = 1000;
+  int page = 110;
+  std::string text((std::istreambuf_iterator<char>(file)),
+                   std::istreambuf_iterator<char>());
 
   std::vector<std::string> words = split(text, " ");
 
@@ -38,10 +39,12 @@ int main() {
   for (int i = 0; i < words.size(); i++) {
     std::string word = words[i];
     if (page == currentPage && i == words.size() - 1) {
+      temp += word + " ";
       result = temp;
       break;
     }
-    if (temp.length() + word.length() + 1 > maximalSymbols && page == currentPage) {
+    if (temp.length() + word.length() + 1 > maximalSymbols &&
+        page == currentPage) {
       result = temp;
     }
     if (temp.length() + word.length() + 1 > maximalSymbols) {
@@ -50,7 +53,6 @@ int main() {
     }
     temp += word + " ";
   }
-
 
   result = std::to_string(currentPage) + " " + result;
 
