@@ -1,4 +1,4 @@
-const { Iconv } = require("iconv");
+const iconv = require('iconv');
 const HronozStream = require("../utils/build/Release/HronozStream");
 const jwt = require("jsonwebtoken");
 const Book = require("../models/Book");
@@ -140,6 +140,7 @@ class ReaderController {
     }
 
     async getPage(req, res) {
+        console.log("Getting page")
         // save borrowed symbols
         let bookID = req.params.bookID;
         let page = req.params.page;
@@ -154,13 +155,16 @@ class ReaderController {
         }
         console.log(targetBook.bookPath);
 
-        const text = HronozStream.read(
+        let text = HronozStream.read(
             Number(maxSymbols),
             Number(page),
             targetBook.bookPath,
         );
 
-        return res.status(200).send(text);
+        let pages = text.split(" ")[0];
+        text = text.substr(text.indexOf(" ") + 1);
+
+        return res.status(200).send({pages : Number(pages), text: text});
     }
 }
 
