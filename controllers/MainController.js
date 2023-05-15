@@ -6,7 +6,7 @@ class MainController {
         MainController._instance = this
     }
     main(req, res) {
-        res.send("Hello there this is main page!")
+        res.send("That is restful api for book_VM web service")
     } 
 }
 
