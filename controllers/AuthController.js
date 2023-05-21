@@ -18,9 +18,7 @@ class AuthController {
     async sendConfirmationEmail(req, res) {
         try {
             console.log("Email confirmation started");
-            const {
-                email,
-            } = req.body;
+            const { email } = req.body;
 
             const user = await User.findOne({
                 email,
@@ -54,9 +52,9 @@ class AuthController {
                 process.env["book_VM_secret"],
                 {
                     expiresIn: "10h",
-                },
+                }
             );
-            
+
             const transporter = nodemailer.createTransport({
                 service: "Yandex",
                 port: 465,
@@ -75,13 +73,12 @@ class AuthController {
             const letterTemplate = await ejs.renderFile(
                 path.join(__dirname, "..", "/public/email_template.ejs"),
                 {
-                    confirmationLink:
-                        `http://${host}/auth/confirm/${jwtConfirmationLink}`,
-                },
+                    confirmationLink: `http://${host}/auth/confirm/${jwtConfirmationLink}`,
+                }
             );
 
             const info = await transporter.sendMail({
-                from: 'Hronologos227@yandex.ru',
+                from: "Hronologos227@yandex.ru",
                 to: email,
                 subject: "Confirm your email",
                 text: "Email",
@@ -125,11 +122,14 @@ class AuthController {
 
             if (!user.isEmailConfirmed) {
                 console.log("Обновляем статус аккаунта");
-                await User.updateOne({
-                    email,
-                }, {
-                    isEmailConfirmed: true,
-                });
+                await User.updateOne(
+                    {
+                        email,
+                    },
+                    {
+                        isEmailConfirmed: true,
+                    }
+                );
             }
 
             return res.send(
@@ -137,9 +137,9 @@ class AuthController {
                     path.join(
                         __dirname,
                         "..",
-                        "/public/email_confirmed_congratulations.ejs",
-                    ),
-                ),
+                        "/public/email_confirmed_congratulations.ejs"
+                    )
+                )
             );
         } catch (e) {
             console.log(e);
@@ -149,12 +149,9 @@ class AuthController {
         }
     }
 
-     login = async (req, res) => {
+    login = async (req, res) => {
         try {
-            const {
-                email,
-                password,
-            } = req.body;
+            const { email, password } = req.body;
 
             const user = await User.findOne({
                 email,
@@ -196,15 +193,19 @@ class AuthController {
                 message: "Internal server error",
             });
         }
-    }
+    };
 
     generateAccessToken(id) {
-        const payload = {
-            id,
-        };
-        return jwt.sign(payload, process.env.book_VM_secret, {
-            expiresIn: "2160h",
-        });
+        try {
+            const payload = {
+                id,
+            };
+            return jwt.sign(payload, process.env.book_VM_secret, {
+                expiresIn: "2160h",
+            });
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     signup = async (req, res) => {
@@ -214,7 +215,7 @@ class AuthController {
 
             const result = validationResult(req);
             if (!result.isEmpty()) {
-                console.log("Достаучались")
+                console.log("Достаучались");
                 return res.status(400).json({ errors: result.array() });
             }
 
@@ -224,10 +225,7 @@ class AuthController {
             }
             console.log("Registration");
 
-            const {
-                email,
-                password,
-            } = req.body;
+            const { email, password } = req.body;
 
             console.log(email, password);
 
@@ -271,7 +269,9 @@ class AuthController {
             });
 
             await user.save();
-            this.sendConfirmationEmail(req, res);
+
+            return res.status(200).send("ok");
+            // this.sendConfirmationEmail(req, res);
         } catch (e) {
             console.log(e);
             await res.status(500).json({

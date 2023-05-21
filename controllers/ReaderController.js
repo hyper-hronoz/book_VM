@@ -45,6 +45,7 @@ class ReaderController {
       return res.status(200).send(books);
     } catch (e) {
       console.error(e);
+      return res.status(500).send("Internal server error");
     }
   }
 
@@ -79,6 +80,7 @@ class ReaderController {
       return res.status(200).send({ msg: "Удалено успешно" });
     } catch (e) {
       console.error(e);
+      return res.status(500).send("Internal server error");
     }
   };
 
@@ -142,31 +144,36 @@ class ReaderController {
   }
 
   async getPage(req, res) {
-    console.log("Getting page");
-    // save borrowed symbols
-    let bookID = req.params.bookID;
-    let page = req.params.page;
-    let maxSymbols = req.params.symbols;
+    try {
+      console.log("Getting page");
+      // save borrowed symbols
+      let bookID = req.params.bookID;
+      let page = req.params.page;
+      let maxSymbols = req.params.symbols;
 
-    console.log(bookID, page, maxSymbols);
+      console.log(bookID, page, maxSymbols);
 
-    const targetBook = await Book.findById(bookID);
+      const targetBook = await Book.findById(bookID);
 
-    if (!targetBook) {
-      return res.status(404).send("This book does not exists or was deleted");
+      if (!targetBook) {
+        return res.status(404).send("This book does not exists or was deleted");
+      }
+      console.log(targetBook.bookPath);
+
+      let text = HronozStream.read(
+        Number(maxSymbols),
+        Number(page),
+        targetBook.bookPath
+      );
+
+      let pages = text.split(" ")[0];
+      text = text.substr(text.indexOf(" ") + 1);
+
+      return res.status(200).send({ pages: Number(pages), text: text });
+    } catch (e) { 
+      console.error(e)
+      return res.status(500).send("Internal server error")
     }
-    console.log(targetBook.bookPath);
-
-    let text = HronozStream.read(
-      Number(maxSymbols),
-      Number(page),
-      targetBook.bookPath
-    );
-
-    let pages = text.split(" ")[0];
-    text = text.substr(text.indexOf(" ") + 1);
-
-    return res.status(200).send({ pages: Number(pages), text: text });
   }
 }
 

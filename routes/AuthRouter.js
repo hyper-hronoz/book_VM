@@ -1,7 +1,6 @@
 const router = require("express").Router();
 
 const controller = require("../controllers/AuthController")
-const addFuckingHeaders = require("../controllers/AddFuckingHeaders")
 
 router.post("/signup", controller.signup)
 router.post("/login", controller.login)
