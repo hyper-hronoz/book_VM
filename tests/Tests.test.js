@@ -19,6 +19,64 @@ describe("getting books", () => {
 
     mongoose.connection.close();
   });
+
+  test("getting favorite books and checking status code", async () => {
+    await mongoose.connect("mongodb://127.0.0.1:27017/books");
+
+    await User.deleteOne({ email: email });
+
+    const resSignUp = await axios.post("http://localhost:8080/auth/signup", {
+      email: email,
+      password: password,
+    });
+
+    expect(resSignUp.status).toBe(200);
+
+    await User.updateOne({ email: email }, { isEmailConfirmed: true });
+
+    const resLogin = await axios.post("http://localhost:8080/auth/login", {
+      email: email,
+      password: password,
+    });
+
+    expect(resLogin.status).toBe(200);
+
+    const { token } = resLogin.data;
+
+    console.log(token);
+    let responseStatus = 0;
+    const res = await axios
+      .get(`http://localhost:8080/books/fav/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .catch((error) => {
+        responseStatus = error.response.status;
+      });
+
+    const books = await Book.find({});
+
+    for (let book of books) {
+      const addToFavorites = await axios.put(
+        `http://localhost:8080/books/fav/${book._id.valueOf()}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      expect(addToFavorites.status).toBe(200);
+    }
+
+    const newRes = await axios.get(`http://localhost:8080/books/fav/`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+
+    expect(responseStatus).toBe(404);
+    expect(newRes.status).toBe(200);
+
+    await User.deleteOne({ email: email });
+
+    mongoose.connection.close();
+  });
 });
 
 describe("authentication", () => {
@@ -97,8 +155,108 @@ describe("authentication", () => {
   });
 });
 
+describe("fav books", () => {
+  test("add to favorites", async () => {
+    await mongoose.connect("mongodb://127.0.0.1:27017/books");
 
+    await User.deleteOne({ email: email });
 
+    const resSignUp = await axios.post("http://localhost:8080/auth/signup", {
+      email: email,
+      password: password,
+    });
+
+    expect(resSignUp.status).toBe(200);
+
+    await User.updateOne({ email: email }, { isEmailConfirmed: true });
+
+    const resLogin = await axios.post("http://localhost:8080/auth/login", {
+      email: email,
+      password: password,
+    });
+
+    expect(resLogin.status).toBe(200);
+
+    const { token } = resLogin.data;
+
+    const oldUser = await User.findOne({ email: email });
+
+    const books = await Book.find({});
+
+    for (let book of books) {
+      const addToFavorites = await axios.put(
+        `http://localhost:8080/books/fav/${book._id.valueOf()}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      expect(addToFavorites.status).toBe(200);
+    }
+
+    const newUser = await User.findOne({ email: email });
+
+    expect(oldUser).not.toBe(newUser);
+
+    await User.deleteOne({ email: email });
+
+    mongoose.connection.close();
+  });
+
+  test("remove from favorites", async () => {
+    await mongoose.connect("mongodb://127.0.0.1:27017/books");
+
+    await User.deleteOne({ email: email });
+
+    const resSignUp = await axios.post("http://localhost:8080/auth/signup", {
+      email: email,
+      password: password,
+    });
+
+    expect(resSignUp.status).toBe(200);
+
+    await User.updateOne({ email: email }, { isEmailConfirmed: true });
+
+    const resLogin = await axios.post("http://localhost:8080/auth/login", {
+      email: email,
+      password: password,
+    });
+
+    expect(resLogin.status).toBe(200);
+
+    const { token } = resLogin.data;
+
+    const oldUser = await User.findOne({ email: email });
+
+    const books = await Book.find({});
+
+    for (let book of books) {
+      const addToFavorites = await axios.put(
+        `http://localhost:8080/books/fav/${book._id.valueOf()}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      expect(addToFavorites.status).toBe(200);
+    }
+
+    for (let book of books) {
+      const addToFavorites = await axios.delete(
+        `http://localhost:8080/books/fav/${book._id.valueOf()}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      expect(addToFavorites.status).toBe(200);
+    }
+
+    const newUser = await User.findOne({ email: email });
+
+    expect(JSON.stringify(oldUser)).toBe(JSON.stringify(newUser));
+
+    await User.deleteOne({ email: email });
+
+    mongoose.connection.close();
+  });
+});
 
 // describe("book reading", () => {
 //   test("read book", async () => {

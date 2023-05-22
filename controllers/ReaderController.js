@@ -26,22 +26,26 @@ class ReaderController {
 
   async getFavBooks(req, res) {
     try {
+      console.log("getting favirite books")
       const token = req.headers.authorization.split(" ")[1];
       const currentUserId = jwt.verify(token, process.env["book_VM_secret"]).id;
       console.log(currentUserId);
 
+      console.log("finding user")
       const user = await User.findById(currentUserId);
 
       if (!user) {
         res.status(400).send("Нет такого пользователя");
       }
 
+      console.log("finding books")
       const books = await Book.find({ _id: { $in: user.favorites } });
 
       if (!books || books.length == 0) {
         return res.status(404).send({ error: "NO fav books found" });
       }
 
+      console.log("finding books")
       return res.status(200).send(books);
     } catch (e) {
       console.error(e);
@@ -88,7 +92,11 @@ class ReaderController {
     try {
       const bookID = req.params.bookID;
 
+      console.log(req.headers)
       const token = req.headers.authorization.split(" ")[1];
+
+      console.log("Add to favirites: ", token)
+
       const userID = jwt.verify(token, process.env["book_VM_secret"]).id;
 
       const book = await Book.findOne({
@@ -113,6 +121,7 @@ class ReaderController {
       return res.status(200).send({ msg: "Book has been added to favorites" });
     } catch (e) {
       console.error(e);
+      return res.send(500).end({msg: "internal server error"})
     }
   }
 
